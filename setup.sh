@@ -324,7 +324,7 @@ if [ "$?" == 0 ]
 
 echo "At $(date): Install PHP start !!!" >> $path/install.log
 yum -y install "libtool*"
-sed -i "s/}/  void (*data)\n\n}/g" /usr/local/gd2/include/gd_io.h
+sed -i "s/}/  void (*data);\n\n}/g" /usr/local/gd2/include/gd_io.h
 cd $path/php-5.4.25
 ./configure --prefix=/usr/local/php \
 --with-apxs2=/usr/local/apache2/bin/apxs \
