@@ -362,7 +362,7 @@ if [ "$?" == 0 ]
 
 echo "At $(date): Install memcache start !!!" >> $path/install.log
 yum -y install zlib-devel
-cd memcache-3.0.8
+cd $path/memcache-3.0.8
 /usr/local/php/bin/phpize
 ./configure \
 --with-php-config=/usr/local/php/bin/php-config
