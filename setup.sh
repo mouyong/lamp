@@ -1,449 +1,524 @@
 #!/bin/bash
-#一键install安装amp
-#Author: Snail (E-mail: 1254075921@qq.com)
+#自动安装amp环境
 
+#定义常量
+name=$(whoami)
+path=/lamp
+
+#同步时间
+if [ "$(rpm -qa ntpdate | grep ntpdate-)" == 0 ];then
+        yum -y install ntpdate
+        echo "At $(date): rpm包ntpdate安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包ntpdate已经安装" >> $path/install.log
+fi
 ntpdate asia.pool.ntp.org &> /dev/null
 
-name=$(whoami | cat)
-#read -t 60 -p 'Please enter lamp Installation package Path(输入所有amp环境相关文件所在的文件夹的绝对路径): ' path
-path=/lamp
-ls $path &> /dev/null
-if [ -z "$path" -a "$?" == 1 ];then
-	path=$(pwd)
-	echo "At $(date): Error installing !!!   No enter Installation package Path" >> $path/install.log
-	unset path
-	exit 1
+#判断包目录是否存在,不存在就创建
+if [ ! -d $path ];then
+        mkdir $path
+        echo "At $(date): 包目录$path 不存在,已创建" >> $path/install.log
+else
+        echo "At $(date): 包目录$path 已存在,无需创建" >> $path/install.log
 fi
 
-echo "At $(date): Installation start ." > $path/install.log
-
-echo "At $(date): Install Compiling package start !!!" >> $path/install.log
-rpm -q nmap | grep -v nmap-
-if [ $? == 0 ];then
-	yum -y install nmap
-fi
-rpm -q gcc | grep -v gcc-
-if [ $? == 0 ];then
-	yum -y install gcc
-fi
-rpm -q gcc-c++ | grep -v gcc-c++-
-if [ $? == 0  ];then
-	yum -y install gcc-c++
-fi
-rpm -q python-devel | grep -v python-devel-
-if [ $? == 0  ];then
-	yum -y install python-devel
-fi
-
-echo "At $(date): Install Compiling package success !!!" >> $path/install.log
-
-echo "At $(date): Install tar start !!!" >> $path/install.log
 cd $path
-ls *.tar.gz > ls.log
-ls *.tgz >> ls.log
-#exit 1: Error installing Compiling package
-if [ "$?" == 0 ]
-	then
-		for i in $(cat ls.log)
-        	do
-            	tar -zxf $i
-        	done
-		rm -rf ls.log
-		echo "At $(date): Install tar success !!!" >> $path/install.log
-	else
-		echo "At $(date): Error installing tar !!!   exit 1" >> $path/install.log
-		exit 1
-	fi
 
-echo "At $(date): Install libxml2 start !!!" >> $path/install.log
+#清空目录
+#ls $path | grep -v *.xz > ~/ls.log
+#rm -rf $path/$(cat ~/ls.log) /usr/lical/libxml2
+
+rm -rf $path/*
+
+echo "At $(date): 环境搭建开始" > $path/install.log
+#检查并卸载
+service httpd stop
+/usr/local/apache2/bin/apachectl stop
+service httpd mysql
+/usr/local/mysql/bin/mysqladmin shutdown -u root -p
+rpm -e httpd mysql php &> /dev/null
+yum -y remove httpd mysql php &> /dev/null
+
+echo "At $(date): httpd mysql php 卸载完成" >> $path/install.log
+
+#判断是否已经设置行号显示,未设置便设置
+if [ "$(grep nu ~/.vimrc)" == 0 ];then
+        echo '"设置显示行号' >> ~/.vimrc
+        echo 'set nu' >> ~/.vimrc
+fi
+
+#判断yum包安装与否
+if [ "$(rpm -qa nmap | grep nmap-)" == 0 ];then
+        yum -y install nmap
+        echo "At $(date): rpm包nmap安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包nmap已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa dos2unix | grep dos2unix-)" == 0 ];then
+        yum -y install dos2unix
+	echo "At $(date): rpm包dos2unix安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包dos2unix已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa gcc | grep gcc-)" == 0 ];then
+        yum -y install gcc 
+        echo "At $(date): rpm包gcc安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包gcc已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa gcc-c++ | grep gcc-c++-)" == 0 ];then
+        yum -y install gcc-c++ 
+        echo "At $(date): rpm包gcc-c++安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包gcc-c++已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa make | grep make-)" == 0 ];then
+        yum -y install make 
+        echo "At $(date): rpm包make安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包make已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa python-devel | grep python-devel-)" == 0 ];then
+        yum -y install python-devel 
+        echo "At $(date): rpm包python-devel安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包python-devel已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa libtool* | grep libtool-)" == 0 ];then
+        yum -y install libtool 
+        echo "At $(date): rpm包libtool*安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包libtool*已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa cmake | grep cmake-)" == 0 ];then
+        yum -y install cmake 
+        echo "At $(date): rpm包cmake安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包cmake已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa bison | grep bison-)" == 0 ];then
+        yum -y install bison 
+        echo "At $(date): rpm包bison安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包bison已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa zlib-devel | grep zlib-devel-)" == 0 ];then
+        yum -y install zlib-devel 
+        echo "At $(date): rpm包zlib-devel安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包zlib-devel已经安装" >> $path/install.log
+fi
+
+
+if [ "$(rpm -qa libevent* | grep libevent-)" == 0 ];then
+        yum -y install libevent* 
+        echo "At $(date): rpm包libevent*安装完成" >> $path/install.log
+else
+        echo "At $(date): rpm包libevent*已经安装" >> $path/install.log
+fi
+
+echo "At $(date): amp环境所需rpm包检测完成" >> $path/install.log
+
+#判断日志文件目录是否存在,不存在就创建
+if [ ! -d $path/logs ];then
+        mkdir $path/logs
+        echo "At $(date): 日志文件目录$path/logs 不存在,已创建" >> $path/install.log
+else
+        echo "At $(date): 日志文件目录$path/logs 已存在,无需创建" >> $path/install.log
+fi
+
+#xxxxxxxxxxxxxxxxxx判断是否下载libxml2xxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/alibxml2-2.9.1.tar.xz ];then
+        wget -o $path/logs/1.libxml2.log -O $path/alibxml2-2.9.1.tar.xz -c https://github.com/mouyong/lamp/blob/master/libxml2-2.9.1.tar.xz?raw=true
+        echo "1. At $(date): libxml2-2.9.1.tar.xz 下载完成" >> $path/install.log
+#fi
+#echo "1. At $(date): libxml2-2.9.1.tar.xz 无需下载" >> $path/install.log
+echo "1. At $(date): libxml2-2.9.1.tar.xz 开始安装" >> $path/install.log
+tar -Jxf alibxml2-2.9.1.tar.xz
 cd $path/libxml2-2.9.1
-./configure --prefix=/usr/local/libxml2
-make && make install
-#exit 2: Error installing libxml2
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install libxml2 success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing libxml2 !!!   exit 2" >> $path/install.log
-		exit 2
-	fi
 
-echo "At $(date): Install libmcrypt start !!!" >> $path/install.log
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/1.libxml2.log
+./configure --prefix=/usr/local/libxml2 >> $path/logs/1.libxml2.log
+
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/1.libxml2.log
+        make >> $path/logs/1.libxml2.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                rm -rf /usr/local/libxml2
+                echo "1. At $(date): libxml2-2.9.1.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 101" >> $path/install.log
+                echo 101
+                exit 101
+
+        else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/1.libxml2.log
+                make install >> $path/logs/1.libxml2.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        rm -rf /usr/local/libxml2
+                        echo "1. At $(date): libxml2-2.9.1.tar.xz 安装失败.配置已清除,文件已删除-------------------exit 102." >> $path/install.log
+                        echo 102
+                        exit 102
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/1.libxml2.log
+        fi
+
+        echo "1. At $(date): libxml2-2.9.1.tar.xz 安装完成" >> $path/install.log
+        echo '1. libxml2 安装路径为 /usr/local/libxml2' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        rm -rf /usr/local/libxml2
+        echo "1. At $(date): libxml2-2.9.1.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 103" >> $path/install.log
+        echo 103
+        exit 103
+fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载libmcryptxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/blibmcrypt-2.5.8.tar.xz ];then
+        wget -o $path/logs/2.libmcrypt.log -O $path/blibmcrypt-2.5.8.tar.xz -c https://github.com/mouyong/lamp/blob/master/libmcrypt-2.5.8.tar.xz?raw=true
+        echo "2. At $(date): libmcrypt-2.5.8.tar.xz 下载完成" >> $path/install.log
+#fi
+#echo "2. At $(date): libmcrypt-2.5.8.tar.xz 无需下载" >> $path/install.log
+echo "2. At $(date): libmcrypt-2.5.8.tar.xz 开始安装" >> $path/install.log
+cd $path
+tar -Jxf blibmcrypt-2.5.8.tar.xz
 cd $path/libmcrypt-2.5.8
-./configure --prefix=/usr/local/libmcrypt
-make && make install
-#exit 3: Error installing libmcrypt
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install libmcrypt success !!!" >> $path/install.log
+
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/2.libmcrypt.log
+./configure --prefix=/usr/local/libmcrypt >> $path/logs/2.libmcrypt.log
+
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/2.libmcrypt.log
+        make >>  $path/logs/2.libmcrypt.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                rm -rf /usr/local/libmcrypt
+                echo "2. At $(date): libmcrypt-2.5.8.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 201" >> $path/install.log
+                echo 201
+                exit 201
+
+        else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/2.libmcrypt.log
+                make install >> $path/logs/2.libmcrypt.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        rm -rf /usr/local/libmcrypt
+                        echo "2. At $(date): libmcrypt-2.5.8.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 202" >> $path/install.log
+                        echo 202
+                        exit 202
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/2.libmcrypt.log
+                cd $path/libmcrypt-2.5.8/libltdl
+                ./configure --enable-ltdl-install
+                make && make install
+                if [ "$?" == 0 ];then
+                        echo "2. At $(date): libmcrypt/libltdl 安装成功 !!!" >> $path/install.log
+                else
+                        make clean
+                        make uninstall  
+                        echo "2. At $(date): libmcrypt/libltdl 安装失败 !!!" >> $path/install.log
+                fi
+        fi
+
+        echo "2. At $(date): libmcrypt-2.5.8.tar.xz 安装完成" >> $path/install.log
+        echo '2. libmcrypt 安装路径为 /usr/local/libmcrypt' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        rm -rf /usr/local/libmcrypt
+        echo "2. At $(date): libmcrypt-2.5.8.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 203" >> $path/install.log
+        echo 203
+        exit 203
+fi
 
 
-		echo "At $(date): Install libmcrypt/libltdl start !!!" >> $path/install.log
-		cd $path/libmcrypt-2.5.8/libltdl
-		./configure --enable-ltdl-install
-		make && make install
-		#exit 4: Error installing libltdl
-		if [ "$?" == 0 ]
-			then
-				echo "At $(date): Install libmcrypt/libltdl success !!!" >> $path/install.log
-			else
-				make clean
-				echo "At $(date): Error installing libmcrypt/libltdl !!!   exit 4" >> $path/install.log
-				exit 4
-			fi
-
-	else
-		make clean
-		echo "At $(date): Error installing libmcrypt !!!   exit 3" >> $path/install.log
-		exit 3
-	fi
-
-echo "At $(date): Install mhash start !!!" >> $path/install.log
+#xxxxxxxxxxxxxxxxx判断是否下载mhashxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/cmhash-0.9.9.9.tar.xz ];then
+        wget -o $path/logs/3.mhash.log -O $path/cmhash-0.9.9.9.tar.xz -c https://github.com/mouyong/lamp/blob/master/mhash-0.9.9.9.tar.xz?raw=true
+        echo "3. At $(date): mcrypt-2.6.8.tar.xz 下载完成" >> $path/install.log
+#fi
+#echo "3. At $(date): mhash-0.9.9.9.tar.xz 无需下载" >> $path/install.log
+echo "3. At $(date): mhash-0.9.9.9.tar.xz 开始安装" >> $path/install.log
+cd $path
+tar -Jxf cmhash-0.9.9.9.tar.xz
 cd $path/mhash-0.9.9.9
-./configure
-make && make install
-#exit 5: Error installing mhash
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install mhash success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing mhash !!!   exit 5" >> $path/install.log
-		exit 5
-	fi
 
-echo "At $(date): Install mcrypt start !!!" >> $path/install.log
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/3.mhash.log
+./configure
+
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/3.mhash.log
+        make >>  $path/logs/3.mhash.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                make uninstall
+                echo "3. At $(date): mhash-0.9.9.9.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 301" >> $path/install.log
+                echo 301
+                exit 301
+
+        else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/3.mhash.log
+                make install >> $path/logs/3.mhash.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        make uninstall
+                        echo "3. At $(date): mhash-0.9.9.9.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 302" >> $path/install.log
+                        echo 302
+                        exit 302
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/3.mhash.log
+        fi
+ 
+        echo "3. At $(date): mhash-0.9.9.9.tar.xz 安装完成" >> $path/install.log
+        echo '3. mhash 安装路径为 默认' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        make uninstall
+        echo "3. At $(date): mhash-0.9.9.9.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 303" >> $path/install.log
+        echo 303
+        exit 303
+fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载mcryptxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/dmcrypt-2.6.8.tar.xz ];then
+        wget -o $path/logs/4.mcrypt.log -O $path/dmcrypt-2.6.8.tar.xz -c https://github.com/mouyong/lamp/blob/master/mcrypt-2.6.8.tar.xz?raw=true
+        echo "4. At $(date): mcrypt-2.6.8.tar.xz 下载完成" >> $path/install.log
+#fi
+#echo "4. At $(date): mcrypt-2.6.8.tar.xz 无需下载" >> $path/install.log
+echo "4. At $(date): 1. mcrypt-2.6.8.tar.xz 开始安装" >> $path/install.log
+cd $path
+tar -Jxf dmcrypt-2.6.8.tar.xz
 cd $path/mcrypt-2.6.8
+
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/4.mcrypt.log
 LD_LIBRARY_PATH=/usr/local/libmcrypt/lib:/usr/local/lib \
 ./configure \
---with-libmcrypt-prefix=/usr/local/libmcrypt
-make && make install
-#exit 6: Error installing mcrypt
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install mcrypt success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing mcrypt !!!   exit 6" >> $path/install.log
-		exit 6
-	fi
+--with-libmcrypt-prefix=/usr/local/libmcrypt >> $path/logs/4.mcrypt.log
 
-echo "At $(date): Install zlib start !!!" >> $path/install.log
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/4.mcrypt.log
+        make >>  $path/logs/4.mcrypt.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                make uninstall
+                echo "4. At $(date): 1. mcrypt-2.6.8.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 401" >> $path/install.log
+                echo 401
+                exit 401
+
+        else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/4.mcrypt.log
+                make install >> $path/logs/4.mcrypt.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        make uninstall
+                        echo "4. At $(date): 1. mcrypt-2.6.8.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 402" >> $path/install.log
+                        echo 402
+                        exit 402
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/4.mcrypt.log
+        fi
+
+        echo "4. At $(date): 1. mcrypt-2.6.8.tar.xz 安装完成" >> $path/install.log
+        echo '4. 1. mcrypt 安装路径为 默认' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        make uninstall
+        echo "4. At $(date): 1. mcrypt-2.6.8.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 403" >> $path/install.log
+        exit 403
+fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载zlibxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/ezlib-1.2.3.tar.xz ];then
+        wget -o $path/logs/5.zlib.log -O $path/ezlib-1.2.3.tar.xz -c https://github.com/mouyong/lamp/blob/master/zlib-1.2.3.tar.xz?raw=true
+        echo "5. At $(date): zlib-1.2.3.tar.xz 下载完成" >> $path/install.log
+#fi
+#echo "5. At $(date): zlib-1.2.3.tar.xz 无需下载" >> $path/install.log
+echo "5. At $(date): zlib-1.2.3.tar.xz 开始安装" >> $path/install.log
+cd $path
+tar -Jxf ezlib-1.2.3.tar.xz
 cd $path/zlib-1.2.3
-./configure --shared
-make && make install
-#exit 7: Error installing zlib
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install zlib success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing zlib !!!   exit 7" >> $path/install.log
-		exit 7
-	fi
 
-echo "At $(date): Install libpng start !!!" >> $path/install.log
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/5.zlib.log
+./configure --shared >> $path/logs/5.zlib.log
+
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/5.zlib.log
+        make >>  $path/logs/5.zlib.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                make uninstall
+                echo "5. At $(date): zlib-1.2.3.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 501" >> $path/install.log
+                echo 501
+                exit 501
+
+        else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/5.zlib.log
+                make install >> $path/logs/5.zlib.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        make uninstall
+                        echo "5. At $(date): zlib-1.2.3.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 502" >> $path/install.log
+                        echo 502
+                        exit 502
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/5.zlib.log
+        fi
+ 
+        echo "5. At $(date): zlib-1.2.3.tar.xz 安装完成" >> $path/install.log
+        echo '5. zlib 安装路径为 默认' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        make uninstall
+        echo "5. At $(date): zlib-1.2.3.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 503" >> $path/install.log
+        echo 503
+        exit 503
+fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载libpngxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/flibpng-1.2.31.tar.xz.tar.xz ];then
+        wget -o $path/logs/6.libpng.log -O $path/flibpng-1.2.31.tar.xz -c https://github.com/mouyong/lamp/blob/master/libpng-1.2.31.tar.xz?raw=true
+        echo "6. At $(date): libpng-1.2.31.tar.xz.tar.xz 下载完成" >> $path/install.log
+#fi
+#echo "6. At $(date): libpng-1.2.31.tar.xz 无需下载" >> $path/install.log
+echo "6. At $(date): libpng-1.2.31.tar.xz 开始安装" >> $path/install.log
+cd $path
+tar -Jxf flibpng-1.2.31.tar.xz
 cd $path/libpng-1.2.31
-./configure --prefix=/usr/local/libpng
-make && make install
-#exit 8: Error installing libpng
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install libpng success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing libpng !!!   exit 8" >> $path/install.log
-		exit 8
-	fi
 
-echo "At $(date): Install jpeg start !!!" >> $path/install.log
-yum -y install libtool
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/6.libpng.log
+./configure --prefix=/usr/local/libpng >> $path/logs/6.libpng.log
+
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/6.libpng.log
+        make >>  $path/logs/6.libpng.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                rm -rf /usr/local/libpng
+                echo "6. At $(date): libpng-1.2.31.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 601" >> $path/install.log
+                echo 601
+                exit 601
+
+         else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/6.libpng.log
+                make install >> $path/logs/6.libpng.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        rm -rf /usr/local/libpng
+                        echo "6. At $(date): libpng-1.2.31.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 602" >> $path/install.log
+                        echo 602
+                        exit 602
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/6.libpng.log
+        fi
+ 
+        echo "6. At $(date): libpng-1.2.31.tar.xz 安装完成" >> $path/install.log
+        echo '6. libpng 安装路径为 /usr/local/libpng' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        rm -rf /usr/local/libpng
+        echo "6. At $(date): libpng-1.2.31.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 603" >> $path/install.log
+        echo 603
+        exit 603
+fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载jpegxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/gjpegsrc.v6b.tar.xz ];then
+        wget -o $path/logs/7.jpeg.log -O $path/gjpegsrc.v6b.tar.xz -c https://github.com/mouyong/lamp/blob/master/jpegsrc.v6b.tar.xz?raw=true
+        echo "7. At $(date): jpegsrc.v6b.tar.xz 下载完成" >> $path/install.log
+#fi
+#echo "7. At $(date): jpegsrc.v6b.tar.xz 无需下载" >> $path/install.log
+echo "7. At $(date): jpegsrc.v6b.tar.xz 开始安装" >> $path/install.log
 mkdir -p /usr/local/jpeg6/{bin,lib,include,man/man1}
+cd $path
+tar -Jxf gjpegsrc.v6b.tar.xz
 cd $path/jpeg-6b
+
 /bin/cp /usr/share/libtool/config/config.* .
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/7.jpeg.log
 ./configure --prefix=/usr/local/jpeg6 \
 --enable-shared \
 --enable-static
-make && make install
-#exit 9: Error installing jpeg6
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install jpeg6 success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing jpeg6 !!!   exit 9" >> $path/install.log
-		exit 9
-	fi
 
-echo "At $(date): Install freetype start !!!" >> $path/install.log
-cd $path/freetype-2.3.5
-./configure --prefix=/usr/local/freetype
-make && make install
-#exit 10: Error installing freetype
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install freetype success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing freetype !!!   exit 10" >> $path/install.log
-		exit 10
-	fi
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/7.jpeg.log
+        make >>  $path/logs/7.jpeg.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                rm -rf /usr/local/jpeg6
+                echo "7. At $(date): jpegsrc.v6b.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 701" >> $path/install.log
+                echo 701
+                exit 701
 
-echo "At $(date): Install gd start !!!" >> $path/install.log
-cd $path/gd-2.0.35
-sed -i "s/png\.h/\/usr\/local\/libpng\/include\/png\.h/g" gd_png.c
-./configure --prefix=/usr/local/gd2 \
---with-jpeg=/usr/local/jpeg6 \
---with-freetype=/usr/local/freetype \
---with-png=/usr/local/libpng \
---enable-shared
-make && make install
-#exit 11: Error installing gd
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install gd success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing gd !!!   exit 11" >> $path/install.log
-		exit 11
-	fi
+         else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/7.jpeg.log
+                make install >> $path/logs/7.jpeg.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        rm -rf /usr/local/jpeg6
+                        echo "7. At $(date): jpegsrc.v6b.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 702" >> $path/install.log
+                        echo 702
+                        exit 702
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/7.jpeg.log
+        fi
+ 
+        echo "7. At $(date): jpegsrc.v6b.tar.xz 安装完成" >> $path/install.log
+        echo '7. jpeg6 安装路径为 /usr/local/jpeg6' >>  $path/install.log
 
-echo "At $(date): Install pcre start !!!" >> $path/install.log
-cp -rf $path/apr-1.4.6 $path/httpd-2.4.7/srclib/apr
-cp -rf $path/apr-util-1.4.1 $path/httpd-2.4.7/srclib/apr-util
-cd $path/pcre-8.34
-./configure
-make && make install
-#exit 12: Error installing pcre
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install pcre success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing pcre !!!   exit 12" >> $path/install.log
-		exit 12
-	fi
-
-echo "At $(date): Install Apache start !!!" >> $path/install.log
-cd $path/httpd-2.4.7
-./configure --prefix=/usr/local/apache2 \
---with-included-apr \
---enable-so \
---enable-deflate=shared \
---enable-expires=shared \
---enable-rewrite=shared
-make && make install
-#exit 13: Error installing Apache
-if [ "$?" == 0 ]
-	then
-		service iptables stop
-		/usr/local/apache2/bin/apachectl start
-		sed -i "s/^# system-specific logs may be also be configured here./\/usr\/local\/apache2\/logs\/access_log {\n    daily\n    create\n    rotate 30\n}\n\n# system-specific logs may be also be configured here./g" /etc/logrotate.conf
-		sed -i "s/^# system-specific logs may be also be configured here./\/usr\/local\/apache2\/logs\/error_log {\n    daily\n    create\n    rotate 30\n}\n\n# system-specific logs may be also be configured here./g" /etc/logrotate.conf
-		sed -i "s/^$/30 4 * * * logrotate \/usr\/local\/apache2\/logs\/access_log\n/g" /var/spool/cron/$name
-		sed -i "s/^$/30 4 * * * logrotate \/usr\/local\/apache2\/logs\/error_log\n/g" /var/spool/cron/$name
-		echo "/usr/local/apache2/bin/apachectl start" >> /etc/rc.d/rc.local
-		ln -s /usr/local/apache2/htdocs ~/www
-		echo "At $(date): Install Apache success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing Apache !!!   exit 13" >> $path/install.log
-		exit 13
-	fi
-
-echo "At $(date): Install ncurses start !!!" >> $path/install.log
-cd $path/ncurses-5.9
-./configure \
---with-shared \
---without-debug \
---without-ada \
---enable-overwrite
-make && make install
-#exit 14: Error installing ncurses
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install ncurses success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing ncurses !!!   exit 14" >> $path/install.log
-		exit 14
-	fi
-
-echo "At $(date): Install cmake & bison start !!!" >> $path/install.log
-yum -y install cmake
-yum -y install bison
-#exit 15: Error installing cmake & bison
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install cmake & bison success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing cmake & bison !!!   exit 15" >> $path/install.log
-		exit 15
-	fi
-
-echo "At $(date): Install MySQL start !!!" >> $path/install.log
-groupadd mysql
-useradd -g mysql mysql
-cd $path/mysql-5.5.23
-cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
--DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
--DEXTRA_CHARSETS=all \
--DDEFAULT_CHARSET=utf8 \
--DDEFAULT_COLLATION=utf8_general_ci \
--DWITH_MYISAM_STORAGE_ENGINE=1 \
--DWITH_INNOBASE_STORAGE_ENGINE=1 \
--DWITH_MEMORY_STORAGE_ENGINE=1 \
--DWITH_READLINE=1 \
--DENABLED_LOCAL_INFILE=1 \
--DMYSQL_USER=mysql \
--DMYSQL_TCP_PORT=3306
-make && make install
-#exit 16: Error installing MySQL
-if [ "$?" == 0 ]
-	then
-		cd /usr/local/mysql
-		chown -R root .
-		chgrp -R mysql .
-		/usr/local/mysql/scripts/mysql_install_db --user=mysql
-		chown -R root .
-		chown -R mysql data
-		\cp support-files/my-medium.cnf /etc/my.cnf
-		/usr/local/mysql/scripts/mysql_install_db --user=mysql
-		/usr/local/mysql/bin/mysqld_safe --user=mysql &
-		echo "/usr/local/mysql/bin/mysqld_safe --user=mysql &" >> /etc/rc.d/rc.local
-		/usr/local/mysql/bin/mysqladmin -u root password
-		echo "At $(date): Install MySQL success !!!" >> $path/install.log
-	else
-		rm -rf CMakeCache.txt
-		make clean
-		echo "At $(date): Error installing MySQL !!!   exit 16" >> $path/install.log
-		exit 16
-	fi
-
-echo "At $(date): Install PHP start !!!" >> $path/install.log
-yum -y install "libtool*"
-sed -i "s/}/  void (*data);\n\n}/g" /usr/local/gd2/include/gd_io.h
-cd $path/php-5.4.25
-./configure --prefix=/usr/local/php \
---with-apxs2=/usr/local/apache2/bin/apxs \
---with-mysql=/usr/local/mysql \
---with-libxml-dir=/usr/local/libxml2 \
---with-jpeg-dir=/usr/local/jpeg6 \
---with-png-dir=/usr/local/libpng \
---with-freetype-dir=/usr/local/freetype \
---with-gd=/usr/local/gd2 \
---with-mcrypt=/usr/local/libmcrypt \
---with-mysqli=/usr/local/mysql/bin/mysql_config \
---enable-soap \
---enable-mbstring=all \
---enable-sockets \
---with-pdo-mysql=/usr/local/mysql \
---with-zlib \
---enable-ftp \
---without-pear \
---enable-shared
-make && make install
-#exit 17: Error installing PHP
-if [ "$?" == 0 ]
-	then
-		mkdir /usr/local/php/etc
-		cp $path/php-5.4.25/php.ini-production /usr/local/php/etc/php.ini
-		sed -i "s/index\.html/index\.html index\.php/g" /usr/local/apache2/conf/httpd.conf
-		sed -i "s/    AddType application\/x-gzip \.gz \.tgz/    AddType application\/x-gzip \.gz \.tgz\n    AddType application\/x-httpd-php \.php/g" /usr/local/apache2/conf/httpd.conf
-		/usr/local/apache2/bin/apachectl restart
-		echo "At $(date): Install PHP success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing PHP !!!   exit 17" >> $path/install.log
-		exit 17
-	fi
-
-echo "At $(date): Install memcache start !!!" >> $path/install.log
-yum -y install zlib-devel
-cd $path/memcache-3.0.8
-/usr/local/php/bin/phpize
-./configure \
---with-php-config=/usr/local/php/bin/php-config
-make && make install
-#exit 18: Error installing memcache
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install memcache success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing memcache !!!   exit 18" >> $path/install.log
-		exit 18
-	fi
-
-echo "At $(date): Install mcrypt start !!!" >> $path/install.log
-cd $path/php-5.4.25/ext/mcrypt
-/usr/local/php/bin/phpize
-./configure \
---with-php-config=/usr/local/php/bin/php-config \
---with-mcrypt=/usr/local/libmcrypt
-make && make install
-#exit 19: Error installing mcrypt
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Install mcrypt success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing mcrypt !!!   exit 19" >> $path/install.log
-		exit 19
-	fi
-
-echo "At $(date): Install Modified php.ini start !!!" >> $path/install.log
-sed -i 's/\; extension_dir = ".\/"/extension_dir = "\/usr\/local\/php\/lib\/php\/extensions\/no-debug-zts-20100525\/"/g' /usr/local/php/etc/php.ini
-echo 'extension="memcache.so";' >> /usr/local/php/etc/php.ini
-echo 'extension="mcrypt.so";' >> /usr/local/php/etc/php.ini
-#exit 20: Error modified php.ini
-if [ "$?" == 0 ]
-	then
-		echo "At $(date): Modified php.ini success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error Modified php.ini !!!   exit 20" >> $path/install.log
-		exit 20
-	fi
-
-echo "At $(date): Install memcached start !!!" >> $path/install.log
-yum -y install "libevent*"
-cd $path/memcached-1.4.17
-./configure --prefix=/usr/local/memcache
-make && make install
-#exit 21: Error installing memcache
-if [ "$?" == 0 ]
-	then
-		useradd memcache
-		/usr/local/memcache/bin/memcached -umemcache &
-		echo "/usr/local/memcache/bin/memcached -umemcache &" >> /etc/rc.d/rc.local
-		echo "At $(date): Install memcache success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing memcache !!!   exit 21" >> $path/install.log
-		exit 21
-	fi
-
-echo "At $(date): Install phpmyadmin start !!!" >> $path/install.log
-cp -rf $path/phpMyAdmin-4.4.11-all-languages /usr/local/apache2/htdocs/phpmyadmin
-cd /usr/local/apache2/htdocs/phpmyadmin
-cp config.sample.inc.php config.inc.php
-#exit 22: Error installing phpmyadmin
-if [ "$?" == 0 ]
-	then
-		sed -i "s/\$cfg\['blowfish_secret'\] = '';/\$cfg\['blowfish_secret'\] = 'root';/g" /usr/local/apache2/htdocs/phpmyadmin/config.inc.php
-		sed -i "s/\['AllowNoPassword'\] = false;/\['AllowNoPassword'\] = true;/g" /usr/local/apache2/htdocs/phpmyadmin/config.inc.php
-		echo "At $(date): Install phpmyadmin success !!!" >> $path/install.log
-	else
-		make clean
-		echo "At $(date): Error installing phpmyadmin !!!   exit 22" >> $path/install.log
-		exit 22
-	fi
-
-unset path
-
-echo "At $(date): 环境搭建完成 !!!" >> $path/install.log
-echo "环境搭建完成"
+else
+        #清除配置,删除文件
+        make clean
+        rm -rf /usr/local/jpeg
+        echo "7. At $(date): jpegsrc.v6b.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 703" >> $path/install.log
+        echo 703
+        exit 703
+fi
 
