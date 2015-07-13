@@ -606,7 +606,7 @@ if [ "$?" == 0 ];then
                 if [ ! "$?" == 0 ];then
                         #清除配置,删除文件
                         make clean
-                        rm -rf /usr/local/libpng
+                        rm -rf /usr/local/gd2
                         echo "9. At $(date): gd-2.0.35.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 602" >> $path/install.log
                         echo 902
                         exit 902
@@ -620,9 +620,60 @@ if [ "$?" == 0 ];then
 else
         #清除配置,删除文件
         make clean
-        rm -rf /usr/local/gd
+        rm -rf /usr/local/gd2
         echo "9. At $(date): gd-2.0.35.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 603" >> $path/install.log
         echo 903
         exit 903
 fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载pcrexxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/jpcre-8.34.tar.xz ];then
+        wget -o $path/logs/10.pcre.log -O $path/jpcre-8.34.tar.xz -c https://github.com/mouyong/lamp/blob/master/pcre-8.34.tar.xz?raw=true
+        echo "10. At $(date): pcre-8.34.tar.xz 下载完成" >> $path/install.log
+#fi
+cd $path
+tar -Jxf jpcre-8.34.tar.xz
+cd $path/pcre-8.34
+
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/10.pcre.log
+./configure >> $path/logs/10.pcre.log
+
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/10.pcre.log
+        make >>  $path/logs/10.pcre.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                make uninstall
+                echo "10. At $(date): pcre-8.34.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 1001" >> $path/install.log
+                echo 1001
+                exit 1001
+
+         else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/10.pcre.log
+                make install >> $path/logs/10.pcre.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        make uninstall
+                        echo "10. At $(date): pcre-8.34.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 1002" >> $path/install.log
+                        echo 1002
+                        exit 1002
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/10.pcre.log
+        fi
+ 
+        echo "10. At $(date): pcre-8.34.tar.xz 安装完成" >> $path/install.log
+        echo '10. pcre 安装路径为 默认' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        make uninstall
+        echo "10. At $(date): pcre-8.34.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 603" >> $path/install.log
+        echo 1003
+        exit 1003
+fi
+
 
