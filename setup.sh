@@ -483,7 +483,7 @@ cd $path/jpeg-6b
 echo '--------------------万恶的configure分割线--------------------' > $path/logs/7.jpeg.log
 ./configure --prefix=/usr/local/jpeg6 \
 --enable-shared \
---enable-static
+--enable-static >> $path/logs/7.jpeg.log
 
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/7.jpeg.log
@@ -520,5 +520,109 @@ else
         echo "7. At $(date): jpegsrc.v6b.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 703" >> $path/install.log
         echo 703
         exit 703
+fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载freexxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/hfreetype-2.3.5.tar.xz ];then
+        wget -o $path/logs/8.freetype.log -O $path/hfreetype-2.3.5.tar.xz -c https://github.com/mouyong/lamp/blob/master/freetype-2.3.5.tar.xz?raw=true
+        echo "8. At $(date): freetype-2.3.5.tar.xz 下载完成" >> $path/install.log
+#fi
+cd $path
+tar -Jxf hfreetype-2.3.5tar.xz
+cd $path/freetype-2.3.5
+
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/8.freetype.log
+./configure --prefix=/usr/local/freetype >> $path/logs/8.freetype.log
+
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/7.jpeg.log
+        make >>  $path/logs/7.jpeg.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                rm -rf /usr/local/freetype
+                echo "7. At $(date): freetype-2.3.5tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 801" >> $path/install.log
+                echo 801
+                exit 801
+
+         else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/8.freetype.log
+                make install >> $path/logs/8.freetype.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        rm -rf /usr/local/freetype
+                        echo "8. At $(date): freetype-2.3.5tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 802" >> $path/install.log
+                        echo 802
+                        exit 802
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/8.freetype.log
+        fi
+ 
+        echo "8. At $(date): freetype-2.3.5tar.xz 安装完成" >> $path/install.log
+        echo '8. freetype 安装路径为 /usr/local/freetype' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        rm -rf /usr/local/freetype
+        echo "7. At $(date): freetype-2.3.5tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 803" >> $path/install.log
+        echo 803
+        exit 803
+fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载gdxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/igd-2.0.35.tar.xz ];then
+        wget -o $path/logs/9.gd.log -O $path/igd-2.0.35.tar.xz -c https://github.com/mouyong/lamp/blob/master/gd-2.0.35.tar.xz?raw=true
+        echo "9. At $(date): gd-2.0.35.tar.xz 下载完成" >> $path/install.log
+#fi
+cd $path
+tar -Jxf igd-2.0.35.tar.xz
+cd $path/gd-2.0.35
+sed -i "s/png\.h/\/usr\/local\/libpng\/include\/png\.h/g" $path/gd-2.0.35/gd_png.c
+
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/9.gd.log
+./configure --prefix=/usr/local/gd2 \
+--with-jpeg=/usr/local/jpeg6 \
+--with-freetype=/usr/local/freetype \
+--with-png=/usr/local/libpng
+
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/9.gd.log
+        make >>  $path/logs/9.gd.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                rm -rf /usr/local/gd2
+                echo "9. At $(date): gd-2.0.35.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 601" >> $path/install.log
+                echo 901
+                exit 901
+
+         else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/9.gd.log
+                make install >> $path/logs/9.gd.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        rm -rf /usr/local/libpng
+                        echo "9. At $(date): gd-2.0.35.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 602" >> $path/install.log
+                        echo 902
+                        exit 902
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/9.gd.log
+        fi
+ 
+        echo "9. At $(date): gd-2.0.35.tar.xz 安装完成" >> $path/install.log
+        echo '9. gd 安装路径为 /usr/local/gd2' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        rm -rf /usr/local/gd
+        echo "9. At $(date): gd-2.0.35.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 603" >> $path/install.log
+        echo 903
+        exit 903
 fi
 
