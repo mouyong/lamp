@@ -157,7 +157,6 @@ cd $path/libxml2-2.9.1
 
 echo '--------------------万恶的configure分割线--------------------' > $path/logs/1.libxml2.log
 ./configure --prefix=/usr/local/libxml2 >> $path/logs/1.libxml2.log
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/1.libxml2.log
         make >> $path/logs/1.libxml2.log
@@ -209,7 +208,6 @@ cd $path/libmcrypt-2.5.8
 
 echo '--------------------万恶的configure分割线--------------------' > $path/logs/2.libmcrypt.log
 ./configure --prefix=/usr/local/libmcrypt >> $path/logs/2.libmcrypt.log
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/2.libmcrypt.log
         make >>  $path/logs/2.libmcrypt.log
@@ -271,7 +269,6 @@ cd $path/mhash-0.9.9.9
 
 echo '--------------------万恶的configure分割线--------------------' > $path/logs/3.mhash.log
 ./configure
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/3.mhash.log
         make >>  $path/logs/3.mhash.log
@@ -325,7 +322,6 @@ echo '--------------------万恶的configure分割线--------------------' > $pa
 LD_LIBRARY_PATH=/usr/local/libmcrypt/lib:/usr/local/lib \
 ./configure \
 --with-libmcrypt-prefix=/usr/local/libmcrypt >> $path/logs/4.mcrypt.log
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/4.mcrypt.log
         make >>  $path/logs/4.mcrypt.log
@@ -376,7 +372,6 @@ cd $path/zlib-1.2.3
 
 echo '--------------------万恶的configure分割线--------------------' > $path/logs/5.zlib.log
 ./configure --shared >> $path/logs/5.zlib.log
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/5.zlib.log
         make >>  $path/logs/5.zlib.log
@@ -428,7 +423,6 @@ cd $path/libpng-1.2.31
 
 echo '--------------------万恶的configure分割线--------------------' > $path/logs/6.libpng.log
 ./configure --prefix=/usr/local/libpng >> $path/logs/6.libpng.log
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/6.libpng.log
         make >>  $path/logs/6.libpng.log
@@ -484,7 +478,6 @@ echo '--------------------万恶的configure分割线--------------------' > $pa
 ./configure --prefix=/usr/local/jpeg6 \
 --enable-shared \
 --enable-static >> $path/logs/7.jpeg.log
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/7.jpeg.log
         make >>  $path/logs/7.jpeg.log
@@ -529,12 +522,11 @@ fi
         echo "8. At $(date): freetype-2.3.5.tar.xz 下载完成" >> $path/install.log
 #fi
 cd $path
-tar -Jxf hfreetype-2.3.5tar.xz
+tar -Jxf hfreetype-2.3.5.tar.xz
 cd $path/freetype-2.3.5
 
 echo '--------------------万恶的configure分割线--------------------' > $path/logs/8.freetype.log
 ./configure --prefix=/usr/local/freetype >> $path/logs/8.freetype.log
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/7.jpeg.log
         make >>  $path/logs/7.jpeg.log
@@ -588,7 +580,6 @@ echo '--------------------万恶的configure分割线--------------------' > $pa
 --with-jpeg=/usr/local/jpeg6 \
 --with-freetype=/usr/local/freetype \
 --with-png=/usr/local/libpng
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/9.gd.log
         make >>  $path/logs/9.gd.log
@@ -638,7 +629,6 @@ cd $path/pcre-8.34
 
 echo '--------------------万恶的configure分割线--------------------' > $path/logs/10.pcre.log
 ./configure >> $path/logs/10.pcre.log
-
 if [ "$?" == 0 ];then
         echo '--------------------万恶的make分割线--------------------' >> $path/logs/10.pcre.log
         make >>  $path/logs/10.pcre.log
@@ -671,9 +661,222 @@ else
         #清除配置,删除文件
         make clean
         make uninstall
-        echo "10. At $(date): pcre-8.34.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 603" >> $path/install.log
+        echo "10. At $(date): pcre-8.34.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 1003" >> $path/install.log
         echo 1003
         exit 1003
 fi
 
+
+#xxxxxxxxxxxxxxxxx判断是否下载apr,apr-util,Apachexxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/kapr-1.4.6.tar.xz ];then
+        wget -o $path/logs/11.apache.log -O $path/kapr-1.4.6.tar.xz -c https://github.com/mouyong/lamp/blob/master/apr-1.4.6.tar.xz?raw=true
+#fi
+#if [ ! -f $path/kapr-util-1.4.1.tar.xz ];then
+        wget -o $path/logs/11.apache.log -O $path/kapr-util-1.4.1.tar.xz -c https://github.com/mouyong/lamp/blob/master/apr-util-1.4.1.tar.xz?raw=true
+#fi
+#if [ ! -f $path/khttpd-2.4.7.tar.xz ];then
+        wget -o $path/logs/11.apache.log -O $path/khttpd-2.4.7.tar.xz -c https://github.com/mouyong/lamp/blob/master/httpd-2.4.7.tar.xz?raw=true
+#fi
+        echo "11. At $(date): apr,apr-util,Apache 下载完成" >> $path/install.log
+cd $path
+tar -Jxf kapr-1.4.6.tar.xz
+tar -Jxf kapr-util-1.4.1.tar.xz
+tar -Jxf khttpd-2.4.7.tar.xz
+cp -rf $path/apr-1.4.6 $path/httpd-2.4.7/srclib/apr
+cp -rf $path/apr-util-1.4.1 $path/httpd-2.4.7/srclib/apr-util
+cd $path/httpd-2.4.7
+
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/11.apache.log
+./configure --prefix=/usr/local/apache2 \
+--with-included-apr \
+--enable-so \
+--enable-deflate=shared \
+--enable-expires=shared \
+--enable-rewrite=shared >> $path/logs/11.apache.log
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/11.apache.log
+        make >>  $path/logs/11.apache.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                rm -rf /usr/local/apache2
+                echo "11. At $(date): Apache 安装失败.配置已清除,文件已删除.----------------------------exit 1101" >> $path/install.log
+                echo 1101
+                exit 1101
+
+         else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/11.apache.log
+                make install >> $path/logs/11.apache.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        rm -rf /usr/local/apache2
+                        echo "11. At $(date): Apache 安装失败.配置已清除,文件已删除.---------------------------------exit 1102" >> $path/install.log
+                        echo 1102
+                        exit 1102
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/11.apache.log
+        fi
+        
+        service iptables stop
+        chkconfig iptables off
+        /usr/local/apache2/bin/apachectl start
+        if [ ! $(cat /etc/logrotate.conf | grep 'apache2/logs/access_log')];then
+                sed -i '27a\/usr\/local\/apache2\/logs\/access_log {\n    daily\n    create\n    rotate 30\n}\n' /etc/logrotate.conf
+        fi
+        if [ ! $(cat /etc/logrotate.conf | grep 'apache2/logs/error_log')];then
+                sed -i '33a\/usr\/local\/apache2\/logs\/access_log {\n    daily\n    create\n    rotate 30\n}\n' /etc/logrotate.conf
+        fi
+        mkdir /var/spool/cron
+        chmod 700 /var/spool/cron
+        touch /var/spool/cron/root 
+        chmod 600 /var/spool/cron/root
+        if [ ! $(cat /etc/rc.d/rc.local | grep '/usr/local/apache2/bin/apachectl') ];then
+                echo "/usr/local/apache2/bin/apachectl start" >> /etc/rc.d/rc.local
+        fi
+        if [ ! $(cat /var/spool/cron/root | grep 'apache2/logs/access_log') ];then
+                echo '30 4 * * * logrotate /usr/local/apache2/logs/error_log' >> /var/spool/cron/$name
+        fi
+        if [ ! $(cat /var/spool/cron/root | grep 'apache2/logs/access_log') ];then
+                echo '30 4 * * * logrotate /usr/local/apache2/logs/error_log' >> /var/spool/cron/$name
+        fi
+        ln -s /usr/local/apache2/htdocs ~/www
+        echo "11. At $(date): Apache 安装完成" >> $path/install.log
+        echo '11. Apache 安装路径为 /usr/local/apache2' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        rm -rf /usr/local/apache2
+        echo "11. At $(date): Apache 安装失败.配置已清除,文件已删除.-------------------------exit 1103" >> $path/install.log
+        echo 1103
+        exit 1103
+fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载ncursesxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/lncurses-5.9.tar.xz ];then
+        wget -o $path/logs/12.ncurses.log -O $path/lncurses-5.9.tar.xz -c https://github.com/mouyong/lamp/blob/master/ncurses-5.9.tar.xz?raw=true
+        echo "11. At $(date): ncurses-5.9.tar.xz 下载完成" >> $path/install.log
+#fi
+cd $path
+tar -Jxf lncurses-5.9.tar.xz
+cd $path/ncurses-5.9
+
+echo '--------------------万恶的configure分割线--------------------' > $path/logs/12.ncurses.log
+./configure \
+--with-shared \
+--without-debug \
+--without-ada \
+--enable-overwrite >> $path/logs/12.ncurses.log
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/12.ncurses.log
+        make >>  $path/logs/12.ncurses.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                make uninstall
+                echo "12. At $(date): ncurses-5.9.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 1201" >> $path/install.log
+                echo 1201
+                exit 1201
+
+         else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/12.ncurses.log
+                make install >> $path/logs/12.ncurses.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        make uninstall
+                        echo "12. At $(date): ncurses-5.9.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 1202" >> $path/install.log
+                        echo 1202
+                        exit 1202
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/12.ncurses.log
+        fi
+ 
+        echo "12. At $(date): ncurses-5.9.tar.xz 安装完成" >> $path/install.log
+        echo '12. ncurses 安装路径为 默认' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        make uninstall
+        echo "12. At $(date): ncurses-5.9.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 1203" >> $path/install.log
+        echo 1203
+        exit 1203
+fi
+
+
+#xxxxxxxxxxxxxxxxx判断是否下载mmysqlxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/mmysql-5.5.23.tar.xz ];then
+        wget -o $path/logs/13.mysql.log -O $path/mmysql-5.5.23.tar.xz -c https://github.com/mouyong/lamp/blob/master/mysql-5.5.23.tar.xz?raw=true
+        echo "11. At $(date): mysql-5.5.23.tar.xz 下载完成" >> $path/install.log
+#fi
+if [ ! $(id mysql) ];then
+        groupadd mysql
+        useradd -g mysql mysql
+fi
+cd $path
+tar -Jxf mmysql-5.5.23-5.9.tar.xz
+cd $path/mysql-5.5.23
+echo '--------------------万恶的cmake分割线--------------------' >> $path/logs/13.mysql.log
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+-DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock \
+-DEXTRA_CHARSETS=all \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_MYISAM_STORAGE_ENGINE=1 \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_MEMORY_STORAGE_ENGINE=1 \
+-DWITH_READLINE=1 \
+-DENABLED_LOCAL_INFILE=1 \
+-DMYSQL_USER=mysql \
+-DMYSQL_TCP_PORT=3306 >> $path/logs/13.mysql.log
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/13.mysql.log
+        make >>  $path/logs/13.mysql.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                rm -rf CMakeCache.txt
+                make uninstall
+                echo "13. At $(date): mysql-5.5.23.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 1301" >> $path/install.log
+                echo 1301
+                exit 1301
+
+         else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/13.mysql.log
+                make install >> $path/logs/13.mysql.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        rm -rf CMakeCache.txt
+                        make uninstall
+                        echo "13. At $(date): mysql-5.5.23.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 1302" >> $path/install.log
+                        echo 1302
+                        exit 1302
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/12.ncurses.log
+        fi
+        cd /usr/local/mysql
+        chown -R root:mysql .
+        chown -R mysql:mysql data
+        \cp support-files/my-medium.cnf /etc/my.cnf
+        /usr/local/mysql/scripts/mysql_install_db --user=mysql
+        /usr/local/mysql/bin/mysqld_safe --user=mysql &
+        if [ ! $(cat /etc/rc.d/rc.local | grep '/usr/local/apache2/bin/apachectl') ];then
+                echo "/usr/local/mysql/bin/mysqld_safe --user=mysql &" >> /etc/rc.d/rc.local
+        fi
+        /usr/local/mysql/bin/mysqladmin -u root password
+        echo "12. At $(date): mysql-5.5.23.tar.xz 安装完成" >> $path/install.log
+        echo '12. mysql 安装路径为 /usr/local/mysql' >>  $path/install.log
+
+else
+        #清除配置,删除文件
+        make clean
+        make uninstall
+        echo "13. At $(date): mysql-5.5.23.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 1303" >> $path/install.log
+        echo 1303
+        exit 1303
+fi
 
