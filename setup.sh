@@ -6,7 +6,8 @@ name=$(whoami)
 path=/lamp
 
 #同步时间
-if [ "$(rpm -qa ntpdate | grep ntpdate-)" == 0 ];then
+rpm -qa ntpdate | grep -v ntpdate-
+if [ "$?" == 0 ];then
         yum -y install ntpdate
         echo "At $(date): rpm包ntpdate安装完成" >> $path/install.log
 else
@@ -27,7 +28,9 @@ cd $path
 #清空目录
 #ls $path | grep -v *.xz > ~/ls.log
 #rm -rf $path/$(cat ~/ls.log) /usr/lical/libxml2
-
+if [ ! "$(ls ~ | grep lamp)" ];then
+        ln -s $path ~
+fi
 rm -rf $path/*
 
 echo "At $(date): 环境搭建开始" > $path/install.log
@@ -35,20 +38,25 @@ echo "At $(date): 环境搭建开始" > $path/install.log
 service httpd stop
 /usr/local/apache2/bin/apachectl stop
 service httpd mysql
-/usr/local/mysql/bin/mysqladmin shutdown -u root -p
+/usr/local/mysql/bin/mysqladmin -u root -p shutdown
+echo ''
 rpm -e httpd mysql php &> /dev/null
 yum -y remove httpd mysql php &> /dev/null
+rm -rf /usr/local/apache2
+rm -rf /usr/local/mysql
+rm -rf /usr/local/php
 
 echo "At $(date): httpd mysql php 卸载完成" >> $path/install.log
 
 #判断是否已经设置行号显示,未设置便设置
-if [ "$(grep nu ~/.vimrc)" == 0 ];then
+if [ "$(grep nu ~/.vimrc)" ];then
         echo '"设置显示行号' >> ~/.vimrc
         echo 'set nu' >> ~/.vimrc
 fi
 
 #判断yum包安装与否
-if [ "$(rpm -qa nmap | grep nmap-)" == 0 ];then
+rpm -qa nmap | grep -v nmap-
+if [ "$?" == 0 ];then
         yum -y install nmap
         echo "At $(date): rpm包nmap安装完成" >> $path/install.log
 else
@@ -56,7 +64,8 @@ else
 fi
 
 
-if [ "$(rpm -qa dos2unix | grep dos2unix-)" == 0 ];then
+rpm -qa dos2unix | grep -v dos2unix-
+if [ "$?" == 0 ];then
         yum -y install dos2unix
 	echo "At $(date): rpm包dos2unix安装完成" >> $path/install.log
 else
@@ -64,7 +73,8 @@ else
 fi
 
 
-if [ "$(rpm -qa gcc | grep gcc-)" == 0 ];then
+rpm -qa gcc | grep -v gcc-
+if [ "$?" == 0 ];then
         yum -y install gcc 
         echo "At $(date): rpm包gcc安装完成" >> $path/install.log
 else
@@ -72,7 +82,8 @@ else
 fi
 
 
-if [ "$(rpm -qa gcc-c++ | grep gcc-c++-)" == 0 ];then
+rpm -qa gcc-c++ | grep -v gcc-c++-
+if [ "$?" == 0 ];then
         yum -y install gcc-c++ 
         echo "At $(date): rpm包gcc-c++安装完成" >> $path/install.log
 else
@@ -80,7 +91,8 @@ else
 fi
 
 
-if [ "$(rpm -qa make | grep make-)" == 0 ];then
+rpm -qa make | grep -v make-
+if [ "$?" ==0 ];then
         yum -y install make 
         echo "At $(date): rpm包make安装完成" >> $path/install.log
 else
@@ -88,7 +100,8 @@ else
 fi
 
 
-if [ "$(rpm -qa python-devel | grep python-devel-)" == 0 ];then
+rpm -qa python-devel | grep -v python-devel-
+if [ "$?" == 0 ];then
         yum -y install python-devel 
         echo "At $(date): rpm包python-devel安装完成" >> $path/install.log
 else
@@ -96,7 +109,8 @@ else
 fi
 
 
-if [ "$(rpm -qa libtool* | grep libtool-)" == 0 ];then
+rpm -qa libtool* | grep -v libtool-
+if [ "$?" == 0 ];then
         yum -y install libtool 
         echo "At $(date): rpm包libtool*安装完成" >> $path/install.log
 else
@@ -104,7 +118,8 @@ else
 fi
 
 
-if [ "$(rpm -qa cmake | grep cmake-)" == 0 ];then
+rpm -qa cmake | grep -v cmake-
+if [ "$?" == 0 ];then
         yum -y install cmake 
         echo "At $(date): rpm包cmake安装完成" >> $path/install.log
 else
@@ -112,7 +127,8 @@ else
 fi
 
 
-if [ "$(rpm -qa bison | grep bison-)" == 0 ];then
+rpm -qa bison | grep -v bison-
+if [ "$?" == 0 ];then
         yum -y install bison 
         echo "At $(date): rpm包bison安装完成" >> $path/install.log
 else
@@ -120,7 +136,8 @@ else
 fi
 
 
-if [ "$(rpm -qa zlib-devel | grep zlib-devel-)" == 0 ];then
+rpm -qa zlib-devel | grep -v zlib-devel-
+if [ "$?" == 0 ];then
         yum -y install zlib-devel 
         echo "At $(date): rpm包zlib-devel安装完成" >> $path/install.log
 else
@@ -128,7 +145,8 @@ else
 fi
 
 
-if [ "$(rpm -qa libevent* | grep libevent-)" == 0 ];then
+rpm -qa libevent* | grep -v libevent-
+if [ "$?" == 0 ];then
         yum -y install libevent* 
         echo "At $(date): rpm包libevent*安装完成" >> $path/install.log
 else
@@ -145,8 +163,11 @@ else
         echo "At $(date): 日志文件目录$path/logs 已存在,无需创建" >> $path/install.log
 fi
 
+
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxxx判断是否下载libxml2xxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/alibxml2-2.9.1.tar.xz ];then
+        echo "1. At $(date): libxml2-2.9.1.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/1.libxml2.log -O $path/alibxml2-2.9.1.tar.xz -c https://github.com/mouyong/lamp/blob/master/libxml2-2.9.1.tar.xz?raw=true
         echo "1. At $(date): libxml2-2.9.1.tar.xz 下载完成" >> $path/install.log
 #fi
@@ -195,8 +216,10 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载libmcryptxxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/blibmcrypt-2.5.8.tar.xz ];then
+        echo "2. At $(date): libmcrypt-2.5.8.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/2.libmcrypt.log -O $path/blibmcrypt-2.5.8.tar.xz -c https://github.com/mouyong/lamp/blob/master/libmcrypt-2.5.8.tar.xz?raw=true
         echo "2. At $(date): libmcrypt-2.5.8.tar.xz 下载完成" >> $path/install.log
 #fi
@@ -256,8 +279,10 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载mhashxxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/cmhash-0.9.9.9.tar.xz ];then
+        echo "3. At $(date): mcrypt-2.6.8.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/3.mhash.log -O $path/cmhash-0.9.9.9.tar.xz -c https://github.com/mouyong/lamp/blob/master/mhash-0.9.9.9.tar.xz?raw=true
         echo "3. At $(date): mcrypt-2.6.8.tar.xz 下载完成" >> $path/install.log
 #fi
@@ -307,8 +332,10 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载mcryptxxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/dmcrypt-2.6.8.tar.xz ];then
+        echo "4. At $(date): mcrypt-2.6.8.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/4.mcrypt.log -O $path/dmcrypt-2.6.8.tar.xz -c https://github.com/mouyong/lamp/blob/master/mcrypt-2.6.8.tar.xz?raw=true
         echo "4. At $(date): mcrypt-2.6.8.tar.xz 下载完成" >> $path/install.log
 #fi
@@ -359,8 +386,10 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载zlibxxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/ezlib-1.2.3.tar.xz ];then
+        echo "5. At $(date): zlib-1.2.3.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/5.zlib.log -O $path/ezlib-1.2.3.tar.xz -c https://github.com/mouyong/lamp/blob/master/zlib-1.2.3.tar.xz?raw=true
         echo "5. At $(date): zlib-1.2.3.tar.xz 下载完成" >> $path/install.log
 #fi
@@ -410,10 +439,12 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载libpngxxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/flibpng-1.2.31.tar.xz.tar.xz ];then
+        echo "6. At $(date): libpng-1.2.31.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/6.libpng.log -O $path/flibpng-1.2.31.tar.xz -c https://github.com/mouyong/lamp/blob/master/libpng-1.2.31.tar.xz?raw=true
-        echo "6. At $(date): libpng-1.2.31.tar.xz.tar.xz 下载完成" >> $path/install.log
+        echo "6. At $(date): libpng-1.2.31.tar.xz 下载完成" >> $path/install.log
 #fi
 #echo "6. At $(date): libpng-1.2.31.tar.xz 无需下载" >> $path/install.log
 echo "6. At $(date): libpng-1.2.31.tar.xz 开始安装" >> $path/install.log
@@ -461,8 +492,10 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载jpegxxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/gjpegsrc.v6b.tar.xz ];then
+        echo "7. At $(date): jpegsrc.v6b.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/7.jpeg.log -O $path/gjpegsrc.v6b.tar.xz -c https://github.com/mouyong/lamp/blob/master/jpegsrc.v6b.tar.xz?raw=true
         echo "7. At $(date): jpegsrc.v6b.tar.xz 下载完成" >> $path/install.log
 #fi
@@ -516,11 +549,14 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载freexxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/hfreetype-2.3.5.tar.xz ];then
+        echo "8. At $(date): freetype-2.3.5.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/8.freetype.log -O $path/hfreetype-2.3.5.tar.xz -c https://github.com/mouyong/lamp/blob/master/freetype-2.3.5.tar.xz?raw=true
         echo "8. At $(date): freetype-2.3.5.tar.xz 下载完成" >> $path/install.log
 #fi
+echo "8. At $(date): freetype-2.3.5.tar.xz 开始安装" >> $path/install.log
 cd $path
 tar -Jxf hfreetype-2.3.5.tar.xz
 cd $path/freetype-2.3.5
@@ -565,11 +601,14 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载gdxxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/igd-2.0.35.tar.xz ];then
+        echo "9. At $(date): gd-2.0.35.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/9.gd.log -O $path/igd-2.0.35.tar.xz -c https://github.com/mouyong/lamp/blob/master/gd-2.0.35.tar.xz?raw=true
         echo "9. At $(date): gd-2.0.35.tar.xz 下载完成" >> $path/install.log
 #fi
+echo "9. At $(date): gd-2.0.35.tar.xz 开始安装" >> $path/install.log
 cd $path
 tar -Jxf igd-2.0.35.tar.xz
 cd $path/gd-2.0.35
@@ -618,11 +657,14 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载pcrexxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/jpcre-8.34.tar.xz ];then
+        echo "10. At $(date): pcre-8.34.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/10.pcre.log -O $path/jpcre-8.34.tar.xz -c https://github.com/mouyong/lamp/blob/master/pcre-8.34.tar.xz?raw=true
         echo "10. At $(date): pcre-8.34.tar.xz 下载完成" >> $path/install.log
 #fi
+echo "10. At $(date): pcre-8.34.tar.xz 开始安装" >> $path/install.log
 cd $path
 tar -Jxf jpcre-8.34.tar.xz
 cd $path/pcre-8.34
@@ -667,8 +709,10 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载apr,apr-util,Apachexxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/kapr-1.4.6.tar.xz ];then
+        echo "11. At $(date): apr,apr-util,Apache 开始下载" >> $path/install.log
         wget -o $path/logs/11.apache.log -O $path/kapr-1.4.6.tar.xz -c https://github.com/mouyong/lamp/blob/master/apr-1.4.6.tar.xz?raw=true
 #fi
 #if [ ! -f $path/kapr-util-1.4.1.tar.xz ];then
@@ -678,6 +722,7 @@ fi
         wget -o $path/logs/11.apache.log -O $path/khttpd-2.4.7.tar.xz -c https://github.com/mouyong/lamp/blob/master/httpd-2.4.7.tar.xz?raw=true
 #fi
         echo "11. At $(date): apr,apr-util,Apache 下载完成" >> $path/install.log
+echo "11. At $(date): Apache 开始安装" >> $path/install.log
 cd $path
 tar -Jxf kapr-1.4.6.tar.xz
 tar -Jxf kapr-util-1.4.1.tar.xz
@@ -754,11 +799,14 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载ncursesxxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/lncurses-5.9.tar.xz ];then
+        echo "11. At $(date): ncurses-5.9.tar.xz 开始下载" >> $path/install.log
         wget -o $path/logs/12.ncurses.log -O $path/lncurses-5.9.tar.xz -c https://github.com/mouyong/lamp/blob/master/ncurses-5.9.tar.xz?raw=true
         echo "11. At $(date): ncurses-5.9.tar.xz 下载完成" >> $path/install.log
 #fi
+echo "12. At $(date): ncurses-5.9.tar.xz 开始安装" >> $path/install.log
 cd $path
 tar -Jxf lncurses-5.9.tar.xz
 cd $path/ncurses-5.9
@@ -807,17 +855,19 @@ else
 fi
 
 
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
 #xxxxxxxxxxxxxxxxx判断是否下载mmysqlxxxxxxxxxxxxxxxxxx
 #if [ ! -f $path/mmysql-5.5.23.tar.xz ];then
         wget -o $path/logs/13.mysql.log -O $path/mmysql-5.5.23.tar.xz -c https://github.com/mouyong/lamp/blob/master/mysql-5.5.23.tar.xz?raw=true
-        echo "11. At $(date): mysql-5.5.23.tar.xz 下载完成" >> $path/install.log
+        echo "13. At $(date): mysql-5.5.23.tar.xz 下载完成" >> $path/install.log
 #fi
-if [ ! $(id mysql) ];then
+echo "13. At $(date): mysql-5.5.23.tar.xz 开始安装" >> $path/install.log
+if [ ! "$(id mysql)" ];then
         groupadd mysql
         useradd -g mysql mysql
 fi
 cd $path
-tar -Jxf mmysql-5.5.23-5.9.tar.xz
+tar -Jxf mmysql-5.5.23.tar.xz
 cd $path/mysql-5.5.23
 echo '--------------------万恶的cmake分割线--------------------' >> $path/logs/13.mysql.log
 cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
@@ -840,6 +890,7 @@ if [ "$?" == 0 ];then
                 make clean
                 rm -rf CMakeCache.txt
                 make uninstall
+                rm -rf /usr/local/mysql
                 echo "13. At $(date): mysql-5.5.23.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 1301" >> $path/install.log
                 echo 1301
                 exit 1301
@@ -852,11 +903,15 @@ if [ "$?" == 0 ];then
                         make clean
                         rm -rf CMakeCache.txt
                         make uninstall
+                        rm -rf /usr/local/mysql
                         echo "13. At $(date): mysql-5.5.23.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 1302" >> $path/install.log
                         echo 1302
                         exit 1302
                 fi
-                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/12.ncurses.log
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/13.mysql.log
+        fi
+        if [ ! "$(ls /tmp | grep mysql.sock)" ];then
+                ln -s /usr/local/mysql/mysql.sock /tmp
         fi
         cd /usr/local/mysql
         chown -R root:mysql .
@@ -868,15 +923,86 @@ if [ "$?" == 0 ];then
                 echo "/usr/local/mysql/bin/mysqld_safe --user=mysql &" >> /etc/rc.d/rc.local
         fi
         /usr/local/mysql/bin/mysqladmin -u root password
-        echo "12. At $(date): mysql-5.5.23.tar.xz 安装完成" >> $path/install.log
-        echo '12. mysql 安装路径为 /usr/local/mysql' >>  $path/install.log
+        echo "13. At $(date): mysql-5.5.23.tar.xz 安装完成" >> $path/install.log
+        echo '13. mysql 安装路径为 /usr/local/mysql' >>  $path/install.log
 
 else
         #清除配置,删除文件
         make clean
         make uninstall
+        rm -rf /usr/local/mysql
         echo "13. At $(date): mysql-5.5.23.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 1303" >> $path/install.log
         echo 1303
         exit 1303
+fi
+
+
+echo '---------------------------------万恶分割线------------------------------------' >> $path/install.log
+#xxxxxxxxxxxxxxxxx判断是否下载nphpxxxxxxxxxxxxxxxxxx
+#if [ ! -f $path/mphp-5.4.25.tar.xz ];then
+        wget -o $path/logs/14.php.log -O $path/nphp-5.4.25.tar.xz -c https://github.com/mouyong/lamp/blob/master/php-5.4.25.tar.xz?raw=true
+        echo "14. At $(date): php-5.4.25.tar.xz 下载完成" >> $path/install.log
+#fi
+if [ ! $(cat /usr/local/gd2/include/gd_io.h | grep 'void (*data);') ];then
+        sed -i "28a\  void (*data);\n" /usr/local/gd2/include/gd_io.h
+fi
+echo "14. At $(date): php-5.4.25.tar.xz 开始安装" >> $path/install.log
+cd $path
+tar -Jxf nphp-5.4.25.tar.xz
+cd $path/php-5.4.25
+echo '--------------------万恶的cmake分割线--------------------' >> $path/logs/14.php.log
+./configure --prefix=/usr/local/php \
+--with-apxs2=/usr/local/apache2/bin/apxs \
+--with-mysql=/usr/local/mysql \
+--with-libxml-dir=/usr/local/libxml2 \
+--with-jpeg-dir=/usr/local/jpeg6 \
+--with-png-dir=/usr/local/libpng \
+--with-freetype-dir=/usr/local/freetype \
+--with-gd=/usr/local/gd2 \
+--with-mcrypt=/usr/local/libmcrypt \
+--with-mysqli=/usr/local/mysql/bin/mysql_config \
+--enable-soap \
+--enable-mbstring=all \
+--enable-sockets \
+--with-pdo-mysql=/usr/local/mysql \
+--with-zlib \
+--enable-ftp \
+--without-pear
+if [ "$?" == 0 ];then
+        echo '--------------------万恶的make分割线--------------------' >> $path/logs/14.php.log
+        make >>  $path/logs/14.php.log
+        if [ ! "$?" == 0 ];then
+                #清除配置,删除文件
+                make clean
+                rm -r /usr/local/php
+                echo "14. At $(date): php-5.4.25.tar.xz 安装失败.配置已清除,文件已删除.----------------------------exit 1301" >> $path/install.log
+                echo 1401
+                exit 1401
+
+         else
+                echo '--------------------万恶的make install分割线--------------------' >> $path/logs/14.php.log
+                make install >> $path/logs/14.php.log
+                if [ ! "$?" == 0 ];then
+                        #清除配置,删除文件
+                        make clean
+                        rm -r /usr/local/php
+                        echo "14. At $(date): php-5.4.25.tar.xz 安装失败.配置已清除,文件已删除.---------------------------------exit 1402" >> $path/install.log
+                        echo 1402
+                        exit 1402
+                fi
+                echo '=======================万恶的make install完成分割线=========================' >> $path/logs/14.php.log
+        fi
+        \bin/cp $path/php-5.4.25/php.ini-production /usr/local/php/lib/php.ini
+        echo "14. At $(date): php-5.4.25.tar.xz 安装完成" >> $path/install.log
+        echo '14. mysql 安装路径为 /usr/local/php' >>  $path/install.log
+
+else
+        else
+        #清除配置,删除文件
+        make clean
+        rm -r /usr/local/php
+        echo "14. At $(date): php-5.4.25.tar.xz 安装失败.配置已清除,文件已删除.-------------------------exit 1403" >> $path/install.log
+        echo 1403
+        exit 1403
 fi
 
